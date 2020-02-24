@@ -32,12 +32,12 @@ class Robot : public frc::TimedRobot {
   nt::NetworkTableEntry i_topSpeed, i_bottomSpeed;
 
 
-  frc::PWMSparkMax m_intake{1}, m_shooterSet{0};
+  frc::PWMSparkMax m_shooterSet{0}, m_ballArticulator{1}, m_endgameLift{2}, m_colorSpinner{3};
   
   WPI_TalonFX m_topShooter{3}, m_bottomShooter{2};
 
   frc::XboxController c_driverController{0};
-  frc::XboxController c_partnerController{1};
+  //frc::XboxController c_partnerController{1};
 
   bool isPartnerEnabled = false;
   frc::Timer rumbleTime;
@@ -45,8 +45,8 @@ class Robot : public frc::TimedRobot {
   void shooterStart(){
        
       if(m_topShooter.Get()==0||m_bottomShooter.Get()==0){
-        m_topShooter.Set(i_topSpeed.GetDouble(0));
-        m_bottomShooter.Set(-i_bottomSpeed.GetDouble(0));
+        m_topShooter.Set(i_topSpeed.GetDouble(.33));
+        m_bottomShooter.Set(-i_bottomSpeed.GetDouble(.30));
         return;
       }
       else{
