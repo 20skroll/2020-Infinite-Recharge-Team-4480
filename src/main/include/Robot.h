@@ -4,6 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+#define isTwoDrivers false
 
 #pragma once
 
@@ -37,7 +38,10 @@ class Robot : public frc::TimedRobot {
   WPI_TalonFX m_topShooter{3}, m_bottomShooter{2};
 
   frc::XboxController c_driverController{0};
-  //frc::XboxController c_partnerController{1};
+ 
+  #if isTwoDrivers
+  frc::XboxController c_partnerController{1};
+  #endif
 
   bool isPartnerEnabled = false;
   frc::Timer rumbleTime;
@@ -55,7 +59,6 @@ class Robot : public frc::TimedRobot {
       }
   }
 
- // frc::XboxController &c_controller; // = isPartnerEnabled ? c_partnerController:c_driverController; 
  
  
  public:
