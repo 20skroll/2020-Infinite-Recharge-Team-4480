@@ -58,22 +58,24 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
     #if !isTwoDrivers
-        isPartnerEnabled ?  d_mechanum.DriveCartesian(c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/2, -c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/2,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/2) :
-                            d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/2, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/2,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/2);
+        isPartnerEnabled ?  d_mechanum.DriveCartesian(c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, -c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear) :
+                            d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear);
         if(c_driverController.GetBackButtonPressed()){
             shooterStart();
         }
         c_driverController.GetBumper(frc::GenericHID::kRightHand)? m_ballArticulator.Set(.50):m_ballArticulator.Set(0);
         c_driverController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
         //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
-        c_driverController.GetBButton()? m_endgameLift.Set(0.5): m_endgameLift.Set(0);
+        c_driverController.GetBButton()? m_endgameLift.Set(1): m_endgameLift.Set(0);
         c_driverController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
+        c_driverController.GetXButton()? m_endgameDeploy.Set(frc::Relay::Value::kReverse) : m_endgameDeploy.Set(frc::Relay::Value::kOff);
+        transmissionSet(c_driverController.GetPOV(0), c_driverController.GetPOV(180));
     #endif
 
     #if isTwoDrivers
     ////////////////////Drive Modes/////////////////////////
-    isPartnerEnabled ?  d_mechanum.DriveCartesian(c_partnerController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/2, -c_partnerController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/2,c_partnerController.GetX(frc::GenericHID::JoystickHand::kRightHand)/2) :
-                        d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/2, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/2,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/2);
+    isPartnerEnabled ?  d_mechanum.DriveCartesian(c_partnerController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, -c_partnerController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_partnerController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear) :
+                        d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear);
     if(c_driverController.GetBackButtonPressed()|| c_partnerController.GetBackButtonPressed()){
         shooterStart();
     }
@@ -103,3 +105,12 @@ void Robot::TestPeriodic() {}
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
 #endif
+
+
+/*
+
+TODO
+LED
+BUTTON
+POV
+*/
