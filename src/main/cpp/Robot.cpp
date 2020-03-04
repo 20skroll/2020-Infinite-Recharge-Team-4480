@@ -24,6 +24,7 @@ void Robot::RobotInit() {
     i_dist = frc::Shuffleboard::GetTab("Driver Station").Add("Distance", 0).GetEntry();
     i_switch = frc::Shuffleboard::GetTab("Driver Station").Add("Button",0).GetEntry();
     frc::Shuffleboard::GetTab("Driver Station").Add("Gear", -gear+5).GetEntry();
+
     if(frc::DriverStation::GetInstance().GetAlliance() == frc::DriverStation::kBlue){
         if(isPartnerEnabled)
             LED.Set(.87);
@@ -94,10 +95,21 @@ void Robot::TeleopPeriodic() {
     c_driverController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
     //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
     (c_driverController.GetPOV()==180)? m_endgameLift.Set(1): m_endgameLift.Set(0);
-    c_driverController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
     (c_driverController.GetPOV(0)==0)? m_endgameDeploy.Set(frc::Relay::Value::kReverse) : m_endgameDeploy.Set(frc::Relay::Value::kOff);
+    if(c_driverController.GetPOV()==90){
+        m_colorSpinner.Set(0.05);
+    }
+    else if(c_driverController.GetPOV()== 270){
+        m_colorSpinner.Set(-0.25);
+    }
+    else{
+        m_colorSpinner.Set(0);
+    }
     transmissionSet(c_driverController.GetAButtonPressed(), c_driverController.GetXButtonPressed());
-
+    if(isSuper){
+        transmissionSet(c_driverController.GetStickButtonPressed(frc::GenericHID::JoystickHand::kRightHand),
+                        c_driverController.GetStickButtonPressed(frc::GenericHID::JoystickHand::kLeftHand));
+    }
 }
 
 
