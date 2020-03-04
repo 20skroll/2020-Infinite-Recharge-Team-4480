@@ -12,12 +12,12 @@
 
 #include <ctre/Phoenix.h>
 #include <frc/PWMSparkMax.h>
+#include <frc/Spark.h>
 
 
 #include <frc/drive/MecanumDrive.h>
 #include <frc/XboxController.h>
 #include <frc/GenericHID.h>
-//#include <frc/buttons/POVButton.h>
 
 #include <frc/Timer.h>
 
@@ -29,25 +29,35 @@
 #include<frc/DigitalInput.h>
 #include<frc/Relay.h>
 
+#include <frc/DriverStation.h>
+
+#include<rev/Rev2mDistanceSensor.h>
 
 
 class Robot : public frc::TimedRobot {
   private:
-  int gear = 2;
-  nt::NetworkTableEntry i_topSpeed, i_bottomSpeed;
 
- 
+  rev::Rev2mDistanceSensor i_distance{rev::Rev2mDistanceSensor::Port::kOnboard, rev::Rev2mDistanceSensor::DistanceUnit::kInches};
+  int gear = 2;
+  bool isSuper = false;
+  double distance;
+  bool isAtTower = false;
+  nt::NetworkTableEntry i_topSpeed, i_bottomSpeed, i_dist, i_switch;
+
+  frc::Timer atonTime;
+
 
   frc::PWMSparkMax m_shooterSet{0}, m_ballArticulator{1}, m_endgameLift{2}, m_colorSpinner{3};
   frc::Relay m_endgameDeploy{0};
 
-frc::DigitalInput i_shooterSwitch{0};
-  
+  frc::DigitalInput i_shooterSwitch{0};
+  frc::Spark LED{9};
+
   WPI_TalonFX m_topShooter{3}, m_bottomShooter{2};
 
  
   frc::XboxController c_driverController{0};
-  //frc::POVButton povUP(c_driverController,0);
+
 
   #if isTwoDrivers
   frc::XboxController c_partnerController{1};
@@ -56,11 +66,36 @@ frc::DigitalInput i_shooterSwitch{0};
   bool isPartnerEnabled = false;
   frc::Timer rumbleTime;
 
+  void shootSequence(){
+    if(m_topShooter.Get()==0 && m_bottomShooter.Get()== 0){
+      shooterStart();
+      frc::Wait(1);
+    }
+    m_shooterSet.Set(.25);
+    frc::Wait(.45);
+    m_shooterSet.Set(0);
+    m_ballArticulator.Set(.50);
+    frc::Wait(1);
+    m_ballArticulator.Set(0);
+    frc::Wait(1.5);
+
+  /*  m_shooterSet.Set(.25);
+    frc::Wait(.5);
+    if(i_shooterSwitch.Get()==true){
+      m_shooterSet.Set(0);}
+    m_ballArticulator.Set(.5);
+    frc::Wait(2);
+    m_ballArticulator.Set(0);*/
+  }
+  void oneRot(){
+    m_shooterSet.Set(0);
+  }
+
   void shooterStart(){
        
       if(m_topShooter.Get()==0||m_bottomShooter.Get()==0){
-        m_topShooter.Set(i_topSpeed.GetDouble(.33));
-        m_bottomShooter.Set(-i_bottomSpeed.GetDouble(.30));
+        m_topShooter.Set(.30);
+        m_bottomShooter.Set(-0.12);
         return;
       }
       else{
@@ -72,8 +107,17 @@ frc::DigitalInput i_shooterSwitch{0};
  void transmissionSet(bool gearUp, bool gearDown){
    if(gearUp && gear<4)
     gear++;
-  if(gearDown && gear>0)
+  if(gearDown && gear>(isSuper? 1:2))
     gear--;
+ }
+
+ void launchReset(){
+  m_shooterSet.Set(.5);
+  if(i_shooterSwitch.Get()==1){
+    m_shooterSet.Set(0.0);
+  }   
+  return;
+  // add bool to put in set or check mode, or use interrupts, cuz you can but probably shouldn't
  }
  
  public:
