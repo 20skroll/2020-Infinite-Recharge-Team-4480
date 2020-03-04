@@ -51,26 +51,11 @@ void Robot::RobotPeriodic() {
         rumbleTime.Start();
         isPartnerEnabled = !isPartnerEnabled;
         c_driverController.SetRumble(frc::GenericHID::RumbleType::kLeftRumble,.5);
-        #if isTwoDrivers
-            c_partnerController.SetRumble(frc::GenericHID::RumbleType::kRightRumble,0.5);
-        #endif
         }
    
-    #if isTwoDrivers
-    if (c_partnerController.GetStartButtonPressed()){
-     rumbleTime.Start();
-     isPartnerEnabled = false;
-     c_driverController.SetRumble(frc::GenericHID::RumbleType::kRightRumble,0.5);
-     c_partnerController.SetRumble(frc::GenericHID::RumbleType::kLeftRumble,0.5);
-     }
-   #endif
    if (rumbleTime.Get()>2){
      c_driverController.SetRumble(frc::GenericHID::RumbleType::kLeftRumble,0);
      c_driverController.SetRumble(frc::GenericHID::RumbleType::kRightRumble,0);
-     #if isTwoDrivers
-     c_partnerController.SetRumble(frc::GenericHID::RumbleType::kRightRumble,0);
-     c_partnerController.SetRumble(frc::GenericHID::RumbleType::kLeftRumble,0);
-     #endif
      rumbleTime.Stop();
      rumbleTime.Reset();
    }
@@ -100,45 +85,18 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
 
-    #if !isTwoDrivers
-        isPartnerEnabled ?  d_mechanum.DriveCartesian(c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, -c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear) :
-                            d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear);
-        if(c_driverController.GetBackButtonPressed()){
-            shooterStart();
-        }
-        c_driverController.GetBumper(frc::GenericHID::kRightHand)? m_ballArticulator.Set(.50):m_ballArticulator.Set(0);
-        c_driverController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
-        //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
-        (c_driverController.GetPOV()==180)? m_endgameLift.Set(1): m_endgameLift.Set(0);
-        c_driverController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
-        (c_driverController.GetPOV(0)==0)? m_endgameDeploy.Set(frc::Relay::Value::kReverse) : m_endgameDeploy.Set(frc::Relay::Value::kOff);
-        transmissionSet(c_driverController.GetAButtonPressed(), c_driverController.GetXButtonPressed());
-    #endif
-
-    #if isTwoDrivers
-    ////////////////////Drive Modes/////////////////////////
-    isPartnerEnabled ?  d_mechanum.DriveCartesian(c_partnerController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, -c_partnerController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_partnerController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear) :
+    isPartnerEnabled ?  d_mechanum.DriveCartesian(c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, -c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear) :
                         d_mechanum.DriveCartesian(-c_driverController.GetX(frc::GenericHID::JoystickHand::kLeftHand)/gear, c_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand)/gear,c_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand)/gear);
-    if(c_driverController.GetBackButtonPressed()|| c_partnerController.GetBackButtonPressed()){
+    if(c_driverController.GetBackButtonPressed()){
         shooterStart();
     }
-    /////////////////////Driver Only/////////////////////////////
-    if (!isPartnerEnabled){
-        c_driverController.GetBumper(frc::GenericHID::kRightHand)? m_ballArticulator.Set(.50):m_ballArticulator.Set(0);
-        c_driverController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
-        //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
-        c_driverController.GetBButton()? m_endgameLift.Set(0.5): m_endgameLift.Set(0);
-        c_driverController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
-    }
-    ///////////////////////Partner Only////////////////////////////
-    if (isPartnerEnabled){
-        c_partnerController.GetBumper(frc::GenericHID::kRightHand)? m_ballArticulator.Set(.50):m_ballArticulator.Set(0);
-        c_partnerController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
-        //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
-        c_partnerController.GetBButton()? m_endgameLift.Set(0.5): m_endgameLift.Set(0);
-        c_partnerController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
-    }
-    #endif
+    c_driverController.GetBumper(frc::GenericHID::kRightHand)? m_ballArticulator.Set(.50):m_ballArticulator.Set(0);
+    c_driverController.GetTriggerAxis(frc::GenericHID::kRightHand)? m_shooterSet.Set(.25):m_shooterSet.Set(0);
+    //c_driverController.GetTriggerAxis(frc::GenericHID::kLeftHand)? m_ballArticulator.Set(-0.25):m_ballArticulator.Set(0);
+    (c_driverController.GetPOV()==180)? m_endgameLift.Set(1): m_endgameLift.Set(0);
+    c_driverController.GetAButton()? m_colorSpinner.Set(0.5): m_colorSpinner.Set(0);
+    (c_driverController.GetPOV(0)==0)? m_endgameDeploy.Set(frc::Relay::Value::kReverse) : m_endgameDeploy.Set(frc::Relay::Value::kOff);
+    transmissionSet(c_driverController.GetAButtonPressed(), c_driverController.GetXButtonPressed());
 
 }
 
@@ -149,12 +107,3 @@ void Robot::TestPeriodic() {}
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
 #endif
-
-
-/*
-
-TODO
-LED
-BUTTON
-POV
-*/

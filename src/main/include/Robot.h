@@ -4,7 +4,6 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-#define isTwoDrivers false
 
 #pragma once
 
@@ -56,10 +55,6 @@ class Robot : public frc::TimedRobot {
  
   frc::XboxController c_driverController{0};
   
-  #if isTwoDrivers
-  frc::XboxController c_partnerController{1};
-  #endif
-
 
 
   void shootSequence(){
