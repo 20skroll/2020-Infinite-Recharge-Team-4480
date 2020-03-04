@@ -20,19 +20,31 @@ void Robot::RobotInit() {
     i_distance.SetAutomaticMode(true);
     i_topSpeed = frc::Shuffleboard::GetTab("Driver Station").Add("Top Spinner Speed", 0.0).WithWidget("Text View").GetEntry();
     i_bottomSpeed = frc::Shuffleboard::GetTab("Driver Station").Add("Bottom Spinner Speed",0.0).WithWidget("Text View").GetEntry();
-    frc::Shuffleboard::GetTab("Driver Station").Add("Is SuperUser", isSuper);
+    frc::Shuffleboard::GetTab("Driver Station").Add("Is SuperUser", isSuper).GetEntry();
     i_dist = frc::Shuffleboard::GetTab("Driver Station").Add("Distance", 0).GetEntry();
     i_switch = frc::Shuffleboard::GetTab("Driver Station").Add("Button",0).GetEntry();
+    frc::Shuffleboard::GetTab("Driver Station").Add("Gear", -gear+5).GetEntry();
     if(frc::DriverStation::GetInstance().GetAlliance() == frc::DriverStation::kBlue){
-        LED.Set(.87);
+        if(isPartnerEnabled)
+            LED.Set(.87);
+        else
+            LED.Set(-0.09);
+        
     }
     else
     {
-        LED.Set(.59);
+        if(isPartnerEnabled)
+            LED.Set(.59);
+        else
+            LED.Set(-0.11);
     }
 }
 
 void Robot::RobotPeriodic() {
+    if(c_driverController.GetBumper(frc::GenericHID::JoystickHand::kRightHand)&& c_driverController.GetBumper(frc::GenericHID::JoystickHand::kLeftHand)&&
+        c_driverController.GetStickButton(frc::GenericHID::JoystickHand::kRightHand) && c_driverController.GetStickButton(frc::GenericHID::JoystickHand::kLeftHand)){
+            isSuper = true;
+        }
     i_dist.SetDouble(i_distance.GetRange());
     i_switch.ForceSetBoolean(i_shooterSwitch.Get());
     if (c_driverController.GetStartButtonPressed()){
@@ -83,7 +95,8 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
-    shooterStart();
+    if(m_topShooter.Get()>0 || m_bottomShooter.Get()>0)
+        shooterStart();
 }
 void Robot::TeleopPeriodic() {
 

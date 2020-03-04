@@ -36,17 +36,16 @@
 
 class Robot : public frc::TimedRobot {
   private:
-
-  rev::Rev2mDistanceSensor i_distance{rev::Rev2mDistanceSensor::Port::kOnboard, rev::Rev2mDistanceSensor::DistanceUnit::kInches};
   int gear = 2;
   bool isSuper = false;
   double distance;
   bool isAtTower = false;
+  bool isPartnerEnabled = false;
+  
+  rev::Rev2mDistanceSensor i_distance{rev::Rev2mDistanceSensor::Port::kOnboard, rev::Rev2mDistanceSensor::DistanceUnit::kInches};
+  frc::Timer rumbleTime;
   nt::NetworkTableEntry i_topSpeed, i_bottomSpeed, i_dist, i_switch;
-
-  frc::Timer atonTime;
-
-
+  
   frc::PWMSparkMax m_shooterSet{0}, m_ballArticulator{1}, m_endgameLift{2}, m_colorSpinner{3};
   frc::Relay m_endgameDeploy{0};
 
@@ -54,17 +53,14 @@ class Robot : public frc::TimedRobot {
   frc::Spark LED{9};
 
   WPI_TalonFX m_topShooter{3}, m_bottomShooter{2};
-
  
   frc::XboxController c_driverController{0};
-
-
+  
   #if isTwoDrivers
   frc::XboxController c_partnerController{1};
   #endif
 
-  bool isPartnerEnabled = false;
-  frc::Timer rumbleTime;
+
 
   void shootSequence(){
     if(m_topShooter.Get()==0 && m_bottomShooter.Get()== 0){
@@ -79,16 +75,7 @@ class Robot : public frc::TimedRobot {
     m_ballArticulator.Set(0);
     frc::Wait(1.5);
 
-  /*  m_shooterSet.Set(.25);
-    frc::Wait(.5);
-    if(i_shooterSwitch.Get()==true){
-      m_shooterSet.Set(0);}
-    m_ballArticulator.Set(.5);
-    frc::Wait(2);
-    m_ballArticulator.Set(0);*/
-  }
-  void oneRot(){
-    m_shooterSet.Set(0);
+  
   }
 
   void shooterStart(){
@@ -120,6 +107,8 @@ class Robot : public frc::TimedRobot {
   // add bool to put in set or check mode, or use interrupts, cuz you can but probably shouldn't
  }
  
+
+
  public:
   void RobotInit() override;
 
