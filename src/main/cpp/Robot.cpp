@@ -20,10 +20,10 @@ void Robot::RobotInit() {
     i_distance.SetAutomaticMode(true);
     i_topSpeed = frc::Shuffleboard::GetTab("Driver Station").Add("Top Spinner Speed", 0.0).WithWidget("Text View").GetEntry();
     i_bottomSpeed = frc::Shuffleboard::GetTab("Driver Station").Add("Bottom Spinner Speed",0.0).WithWidget("Text View").GetEntry();
-    frc::Shuffleboard::GetTab("Driver Station").Add("Is SuperUser", isSuper).GetEntry();
-    i_dist = frc::Shuffleboard::GetTab("Driver Station").Add("Distance", 0).GetEntry();
+    frc::Shuffleboard::GetTab("Driver Station").Add("Is SuperUser", isSuper).WithSize(2,1).WithPosition(0,6).GetEntry();
+    i_dist = frc::Shuffleboard::GetTab("Driver Station").Add("Distance", 0).WithSize(2,1).WithPosition(0,2).GetEntry();
     i_switch = frc::Shuffleboard::GetTab("Driver Station").Add("Button",0).GetEntry();
-    frc::Shuffleboard::GetTab("Driver Station").Add("Gear", -gear+5).GetEntry();
+    frc::Shuffleboard::GetTab("Driver Station").Add("Gear", -gear+5).WithSize(2,1).WithPosition(0,0).GetEntry();
     if(frc::DriverStation::GetInstance().GetAlliance() == frc::DriverStation::kBlue){
         if(isPartnerEnabled)
             LED.Set(.87);
